@@ -17,14 +17,14 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "product_condition")
-public class ProductCondition {
+@Table(name = "product_item_condition")
+public class ProductItemCondition {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "condition_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-	private Condition condition;
+	@JoinColumn(name = "item_condition_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+	private ItemCondition itemCondition;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "product_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
