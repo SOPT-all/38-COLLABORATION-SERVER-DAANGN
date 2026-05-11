@@ -19,6 +19,9 @@ public class PriceInfo {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Column(name = "code", nullable = false)
+	private String code;
+
 	@Column(name = "name", nullable = false)
 	private String name;
 }
