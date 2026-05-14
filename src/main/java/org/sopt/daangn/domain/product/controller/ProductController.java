@@ -8,6 +8,7 @@ import org.sopt.daangn.global.api.response.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
@@ -27,8 +28,15 @@ public class ProductController {
 	}
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ProductListResponse>>> getProducts() {
+    public ResponseEntity<ApiResponse<List<ProductListResponse>>> getProducts(
+            @RequestParam(required = false) String conditionCode,
+            @RequestParam(required = false) String tradeTypeCode,
+            @RequestParam(required = false) String priceInfoCode
+    ) {
         return ResponseEntity.status(SuccessCode.PRODUCT_FOUND.getHttpStatus())
-                .body(ApiResponse.success(SuccessCode.PRODUCT_FOUND, productService.getProducts()));
+                .body(ApiResponse.success(
+                        SuccessCode.PRODUCT_FOUND,
+                        productService.getProducts(conditionCode, tradeTypeCode, priceInfoCode)
+                ));
     }
 }

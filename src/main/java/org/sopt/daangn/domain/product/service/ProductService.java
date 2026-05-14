@@ -35,8 +35,12 @@ public class ProductService {
 		return CategoryResponse.of(itemConditions, tradeTypes, priceInfos);
 	}
 
-    public List<ProductListResponse> getProducts() {
-        return productRepository.findAll()
+    public List<ProductListResponse> getProducts(
+            String conditionCode,
+            String tradeTypeCode,
+            String priceInfoCode
+    ) {
+        return productRepository.findProductsByFilter(conditionCode, tradeTypeCode, priceInfoCode)
                 .stream()
                 .map(product -> ProductListResponse.of(product, getTags(product.getId())))
                 .toList();
