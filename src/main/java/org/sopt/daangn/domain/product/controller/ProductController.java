@@ -1,6 +1,7 @@
 package org.sopt.daangn.domain.product.controller;
 
 import org.sopt.daangn.domain.product.controller.code.SuccessCode;
+import org.sopt.daangn.domain.product.dto.response.AdProductResponse;
 import org.sopt.daangn.domain.product.dto.response.CategoryResponse;
 import org.sopt.daangn.domain.product.dto.response.ProductListResponse;
 import org.sopt.daangn.domain.product.service.ProductService;
@@ -26,6 +27,12 @@ public class ProductController {
 		return ResponseEntity.status(SuccessCode.CATEGORY_FOUND.getHttpStatus())
 				.body(ApiResponse.success(SuccessCode.CATEGORY_FOUND, productService.getCategories()));
 	}
+
+    @GetMapping(path = "/ad")
+    public ResponseEntity<ApiResponse<List<AdProductResponse>>> getAdProducts() {
+        return ResponseEntity.status(SuccessCode.AD_PRODUCTS_FOUND.getHttpStatus())
+                .body(ApiResponse.success(SuccessCode.AD_PRODUCTS_FOUND, productService.getAdProducts()));
+    }
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<ProductListResponse>>> getProducts(

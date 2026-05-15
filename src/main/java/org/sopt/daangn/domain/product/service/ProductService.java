@@ -5,8 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.sopt.daangn.domain.product.dto.response.AdProductResponse;
 import org.sopt.daangn.domain.product.dto.response.CategoryResponse;
 import org.sopt.daangn.domain.product.dto.response.ProductListResponse;
+import org.sopt.daangn.domain.product.entity.AdProduct;
 import org.sopt.daangn.domain.product.entity.ItemCondition;
 import org.sopt.daangn.domain.product.entity.PriceInfo;
 import org.sopt.daangn.domain.product.entity.Product;
@@ -14,6 +16,7 @@ import org.sopt.daangn.domain.product.entity.ProductItemCondition;
 import org.sopt.daangn.domain.product.entity.ProductPriceInfo;
 import org.sopt.daangn.domain.product.entity.ProductTradeType;
 import org.sopt.daangn.domain.product.entity.TradeType;
+import org.sopt.daangn.domain.product.repository.AdProductRepository;
 import org.sopt.daangn.domain.product.repository.ItemConditionRepository;
 import org.sopt.daangn.domain.product.repository.PriceInfoRepository;
 import org.sopt.daangn.domain.product.repository.ProductItemConditionRepository;
@@ -34,6 +37,7 @@ public class ProductService {
     private final ItemConditionRepository itemConditionRepository;
     private final TradeTypeRepository tradeTypeRepository;
     private final PriceInfoRepository priceInfoRepository;
+    private final AdProductRepository adProductRepository;
     private final ProductItemConditionRepository productItemConditionRepository;
     private final ProductTradeTypeRepository productTradeTypeRepository;
     private final ProductPriceInfoRepository productPriceInfoRepository;
@@ -44,6 +48,14 @@ public class ProductService {
         List<PriceInfo> priceInfos = priceInfoRepository.findAll();
 
         return CategoryResponse.of(itemConditions, tradeTypes, priceInfos);
+    }
+
+    public List<AdProductResponse> getAdProducts() {
+        List<AdProduct> adProducts = adProductRepository.findTop5ByOrderByIdAsc();
+
+        return adProducts.stream()
+                .map(AdProductResponse::from)
+                .toList();
     }
 
     public List<ProductListResponse> getProducts(
