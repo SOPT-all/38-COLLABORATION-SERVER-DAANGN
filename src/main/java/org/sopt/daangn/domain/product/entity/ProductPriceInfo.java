@@ -21,6 +21,7 @@ import lombok.NoArgsConstructor;
 public class ProductPriceInfo {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "price_info_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))

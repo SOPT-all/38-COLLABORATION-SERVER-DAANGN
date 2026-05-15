@@ -21,9 +21,10 @@ import lombok.NoArgsConstructor;
 public class ProductTradeType {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "trade_tpye_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+	@JoinColumn(name = "trade_type_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private TradeType tradeType;
 
 	@ManyToOne(fetch = FetchType.LAZY)
