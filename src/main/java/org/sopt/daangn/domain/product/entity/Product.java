@@ -1,6 +1,8 @@
 package org.sopt.daangn.domain.product.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.sopt.daangn.global.common.entity.BaseEntity;
 
@@ -9,9 +11,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -62,4 +64,7 @@ public class Product extends BaseEntity {
 
 	@Column(name = "manner_temperature", nullable = false)
 	private float mannerTemperature;
+
+	@OneToMany(mappedBy = "product")
+	private List<ProductImage> productImages = new ArrayList<>();
 }

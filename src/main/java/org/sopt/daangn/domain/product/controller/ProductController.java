@@ -3,11 +3,13 @@ package org.sopt.daangn.domain.product.controller;
 import org.sopt.daangn.domain.product.controller.code.SuccessCode;
 import org.sopt.daangn.domain.product.dto.response.AdProductResponse;
 import org.sopt.daangn.domain.product.dto.response.CategoryResponse;
+import org.sopt.daangn.domain.product.dto.response.ProductDetailResponse;
 import org.sopt.daangn.domain.product.dto.response.ProductListResponse;
 import org.sopt.daangn.domain.product.service.ProductService;
 import org.sopt.daangn.global.api.response.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,4 +51,12 @@ public class ProductController {
                         productService.getProducts(minPrice, maxPrice, distanceCode,conditionCode, tradeTypeCode, priceInfoCode)
                 ));
     }
+
+	@GetMapping(path = "/{productId}")
+	public ResponseEntity<ApiResponse<ProductDetailResponse>> getProductDetail(
+			@PathVariable(name = "productId") long productId
+	) {
+		return ResponseEntity.status(SuccessCode.PRODUCT_FOUND.getHttpStatus())
+				.body(ApiResponse.success(SuccessCode.PRODUCT_FOUND, productService.getProductDetail(productId)));
+	}
 }

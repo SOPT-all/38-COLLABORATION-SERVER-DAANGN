@@ -31,7 +31,7 @@ public class ProductImage {
 	@Column(name = "image_url", nullable = false)
 	private String imageUrl;
 
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "product_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private Product product;
 }

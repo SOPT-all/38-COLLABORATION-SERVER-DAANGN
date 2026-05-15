@@ -17,4 +17,12 @@ public interface ProductTradeTypeRepository extends JpaRepository<ProductTradeTy
 			where ptt.product.id in :productIds
 			""")
     List<ProductTradeType> findAllWithTradeTypeByProductIds(@Param("productIds") List<Long> productIds);
+
+	@Query("""
+			select ptt
+			from ProductTradeType ptt
+			join fetch ptt.tradeType
+			where ptt.product.id = :productId
+			""")
+	List<ProductTradeType> findAllByProductId(@Param(value = "productId") long productId);
 }

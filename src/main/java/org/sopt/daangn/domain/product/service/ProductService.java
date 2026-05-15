@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.sopt.daangn.domain.product.dto.response.AdProductResponse;
 import org.sopt.daangn.domain.product.dto.response.CategoryResponse;
+import org.sopt.daangn.domain.product.dto.response.ProductDetailResponse;
 import org.sopt.daangn.domain.product.dto.response.ProductListResponse;
 import org.sopt.daangn.domain.product.entity.AdProduct;
 import org.sopt.daangn.domain.product.entity.ItemCondition;
@@ -16,6 +17,7 @@ import org.sopt.daangn.domain.product.entity.ProductItemCondition;
 import org.sopt.daangn.domain.product.entity.ProductPriceInfo;
 import org.sopt.daangn.domain.product.entity.ProductTradeType;
 import org.sopt.daangn.domain.product.entity.TradeType;
+import org.sopt.daangn.domain.product.exception.ProductNotFoundException;
 import org.sopt.daangn.domain.product.repository.AdProductRepository;
 import org.sopt.daangn.domain.product.repository.ItemConditionRepository;
 import org.sopt.daangn.domain.product.repository.PriceInfoRepository;
@@ -87,6 +89,24 @@ public class ProductService {
                         tagsByProductId.getOrDefault(product.getId(), List.of())
                 ))
                 .toList();
+    }
+
+    public ProductDetailResponse getProductDetail(long id) {
+        Product product = productRepository.findByIdWithImages(id).orElseThrow(ProductNotFoundException::new);
+
+        List<ItemCondition> itemConditions = productItemConditionRepository.findAllByProductId(id)
+                .stream()
+                .map(ProductItemCondition::getItemCondition)
+                .toList();
+        List<TradeType> tradeTypes = productTradeTypeRepository.findAllByProductId(id)
+                .stream()
+                .map(ProductTradeType::getTradeType)
+                .toList();
+        List<PriceInfo> priceInfos = productPriceInfoRepository.findAllByProductId(id)
+                .stream()
+                .map(ProductPriceInfo::getPriceInfo)
+                .toList();
+        return ProductDetailResponse.of(product, itemConditions, tradeTypes, priceInfos);
     }
 
     private Map<Long, List<String>> getTagsByProductId(List<Long> productIds) {
