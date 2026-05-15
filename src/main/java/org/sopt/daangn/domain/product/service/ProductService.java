@@ -36,11 +36,14 @@ public class ProductService {
 	}
 
     public List<ProductListResponse> getProducts(
+            Integer minPrice,
+            Integer maxPrice,
+            String distanceCode,
             String conditionCode,
             String tradeTypeCode,
             String priceInfoCode
     ) {
-        return productRepository.findProductsByFilter(conditionCode, tradeTypeCode, priceInfoCode)
+        return productRepository.findProductsByFilter(minPrice, maxPrice, distanceCode,conditionCode, tradeTypeCode, priceInfoCode)
                 .stream()
                 .map(product -> ProductListResponse.of(product, getTags(product.getId())))
                 .toList();

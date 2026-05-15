@@ -15,6 +15,9 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
     @Override
     public List<Product> findProductsByFilter(
+            Integer minPrice,
+            Integer maxPrice,
+            String distanceCode,
             String conditionCode,
             String tradeTypeCode,
             String priceInfoCode
@@ -37,12 +40,37 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 .leftJoin(productPriceInfo).on(productPriceInfo.product.eq(product))
                 .leftJoin(productPriceInfo.priceInfo, priceInfo)
                 .where(
+                        minPriceGoe(product, minPrice),
+                        maxPriceLoe(product, maxPrice),
+                        distanceCodeCondition(product, distanceCode),
                         conditionCodeEq(itemCondition, conditionCode),
                         tradeTypeCodeEq(tradeType, tradeTypeCode),
                         priceInfoCodeEq(priceInfo, priceInfoCode)
                 )
                 .orderBy(product.lastBumpedAt.desc())
                 .fetch();
+    }
+
+    private BooleanExpression minPriceGoe(QProduct product, Integer minPrice) {
+        return minPrice != null ? product.price.goe(minPrice) : null;
+    }
+
+    private BooleanExpression maxPriceLoe(QProduct product, Integer maxPrice) {
+        return maxPrice != null ? product.price.loe(maxPrice) : null;
+    }
+
+    private BooleanExpression distanceCodeCondition(QProduct product, String distanceCode) {
+        if (!hasText(distanceCode)) {
+            return null;
+        }
+
+        return switch (distanceCode) {
+            case "DISTANCE_500M" -> product.distance.loe(500);
+            case "DISTANCE_1KM" -> product.distance.loe(1000);
+            case "DISTANCE_2KM_WITHIN" -> product.distance.loe(2000);
+            case "DISTANCE_2KM_OVER" -> product.distance.goe(2000);
+            default -> null;
+        };
     }
 
     private BooleanExpression conditionCodeEq(QItemCondition itemCondition, String conditionCode) {

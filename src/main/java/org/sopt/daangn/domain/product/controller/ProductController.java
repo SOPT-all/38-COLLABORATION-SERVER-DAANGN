@@ -29,6 +29,9 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<ProductListResponse>>> getProducts(
+            @RequestParam(required = false) Integer minPrice,
+            @RequestParam(required = false) Integer maxPrice,
+            @RequestParam(required = false) String distanceCode,
             @RequestParam(required = false) String conditionCode,
             @RequestParam(required = false) String tradeTypeCode,
             @RequestParam(required = false) String priceInfoCode
@@ -36,7 +39,7 @@ public class ProductController {
         return ResponseEntity.status(SuccessCode.PRODUCT_FOUND.getHttpStatus())
                 .body(ApiResponse.success(
                         SuccessCode.PRODUCT_FOUND,
-                        productService.getProducts(conditionCode, tradeTypeCode, priceInfoCode)
+                        productService.getProducts(minPrice, maxPrice, distanceCode,conditionCode, tradeTypeCode, priceInfoCode)
                 ));
     }
 }
