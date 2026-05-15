@@ -2,14 +2,13 @@ package org.sopt.daangn.domain.product.service;
 
 import java.util.List;
 
+import org.sopt.daangn.domain.product.dto.response.AdProductResponse;
 import org.sopt.daangn.domain.product.dto.response.CategoryResponse;
+import org.sopt.daangn.domain.product.entity.AdProduct;
 import org.sopt.daangn.domain.product.entity.ItemCondition;
 import org.sopt.daangn.domain.product.entity.PriceInfo;
 import org.sopt.daangn.domain.product.entity.TradeType;
-import org.sopt.daangn.domain.product.repository.ItemConditionRepository;
-import org.sopt.daangn.domain.product.repository.PriceInfoRepository;
-import org.sopt.daangn.domain.product.repository.ProductRepository;
-import org.sopt.daangn.domain.product.repository.TradeTypeRepository;
+import org.sopt.daangn.domain.product.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +22,7 @@ public class ProductService {
 	private final ItemConditionRepository itemConditionRepository;
 	private final TradeTypeRepository tradeTypeRepository;
 	private final PriceInfoRepository priceInfoRepository;
+    private final AdProductRepository adProductRepository;
 
 
 	public CategoryResponse getCategories(){
@@ -32,4 +32,11 @@ public class ProductService {
 
 		return CategoryResponse.of(itemConditions, tradeTypes, priceInfos);
 	}
+    public List<AdProductResponse> getAdProducts() {
+        List<AdProduct> adProducts = adProductRepository.findTop5ByOrderByIdAsc();
+
+        return adProducts.stream()
+                .map(AdProductResponse::from)
+                .toList();
+    }
 }

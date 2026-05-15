@@ -27,4 +27,7 @@ public class AdProduct {
 
 	@Column(name = "seller", nullable = false)
 	private String seller;
+
+    @Column(name = "image_url", nullable = false)
+    private String imageUrl;
 }
