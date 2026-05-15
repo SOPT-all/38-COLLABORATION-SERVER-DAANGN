@@ -21,6 +21,7 @@ import lombok.NoArgsConstructor;
 public class ProductItemCondition {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "item_condition_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
