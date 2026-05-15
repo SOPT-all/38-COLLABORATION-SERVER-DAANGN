@@ -1,14 +1,26 @@
 package org.sopt.daangn.domain.product.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.sopt.daangn.domain.product.dto.response.CategoryResponse;
 import org.sopt.daangn.domain.product.dto.response.ProductListResponse;
 import org.sopt.daangn.domain.product.entity.ItemCondition;
 import org.sopt.daangn.domain.product.entity.PriceInfo;
+import org.sopt.daangn.domain.product.entity.Product;
+import org.sopt.daangn.domain.product.entity.ProductItemCondition;
+import org.sopt.daangn.domain.product.entity.ProductPriceInfo;
+import org.sopt.daangn.domain.product.entity.ProductTradeType;
 import org.sopt.daangn.domain.product.entity.TradeType;
-import org.sopt.daangn.domain.product.repository.*;
+import org.sopt.daangn.domain.product.repository.ItemConditionRepository;
+import org.sopt.daangn.domain.product.repository.PriceInfoRepository;
+import org.sopt.daangn.domain.product.repository.ProductItemConditionRepository;
+import org.sopt.daangn.domain.product.repository.ProductPriceInfoRepository;
+import org.sopt.daangn.domain.product.repository.ProductRepository;
+import org.sopt.daangn.domain.product.repository.ProductTradeTypeRepository;
+import org.sopt.daangn.domain.product.repository.TradeTypeRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,22 +30,21 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ProductService {
-	private final ProductRepository productRepository;
-	private final ItemConditionRepository itemConditionRepository;
-	private final TradeTypeRepository tradeTypeRepository;
-	private final PriceInfoRepository priceInfoRepository;
+    private final ProductRepository productRepository;
+    private final ItemConditionRepository itemConditionRepository;
+    private final TradeTypeRepository tradeTypeRepository;
+    private final PriceInfoRepository priceInfoRepository;
     private final ProductItemConditionRepository productItemConditionRepository;
     private final ProductTradeTypeRepository productTradeTypeRepository;
     private final ProductPriceInfoRepository productPriceInfoRepository;
 
+    public CategoryResponse getCategories() {
+        List<ItemCondition> itemConditions = itemConditionRepository.findAll();
+        List<TradeType> tradeTypes = tradeTypeRepository.findAll();
+        List<PriceInfo> priceInfos = priceInfoRepository.findAll();
 
-	public CategoryResponse getCategories(){
-		List<ItemCondition> itemConditions = itemConditionRepository.findAll();
-		List<TradeType> tradeTypes = tradeTypeRepository.findAll();
-		List<PriceInfo> priceInfos = priceInfoRepository.findAll();
-
-		return CategoryResponse.of(itemConditions, tradeTypes, priceInfos);
-	}
+        return CategoryResponse.of(itemConditions, tradeTypes, priceInfos);
+    }
 
     public List<ProductListResponse> getProducts(
             Integer minPrice,
@@ -43,30 +54,75 @@ public class ProductService {
             String tradeTypeCode,
             String priceInfoCode
     ) {
-        return productRepository.findProductsByFilter(minPrice, maxPrice, distanceCode,conditionCode, tradeTypeCode, priceInfoCode)
-                .stream()
-                .map(product -> ProductListResponse.of(product, getTags(product.getId())))
+        List<Product> products = productRepository.findProductsByFilter(
+                minPrice,
+                maxPrice,
+                distanceCode,
+                conditionCode,
+                tradeTypeCode,
+                priceInfoCode
+        );
+
+        List<Long> productIds = products.stream()
+                .map(Product::getId)
+                .toList();
+
+        Map<Long, List<String>> tagsByProductId = getTagsByProductId(productIds);
+
+        return products.stream()
+                .map(product -> ProductListResponse.of(
+                        product,
+                        tagsByProductId.getOrDefault(product.getId(), List.of())
+                ))
                 .toList();
     }
 
-    private List<String> getTags(Long productId) {
-        List<String> tags = new ArrayList<>();
+    private Map<Long, List<String>> getTagsByProductId(List<Long> productIds) {
+        Map<Long, List<String>> tagsByProductId = new HashMap<>();
 
-        tags.addAll(productItemConditionRepository.findAllByProduct_Id(productId)
-                .stream()
-                .map(productItemCondition -> productItemCondition.getItemCondition().getName())
-                .toList());
+        if (productIds.isEmpty()) {
+            return tagsByProductId;
+        }
 
-        tags.addAll(productTradeTypeRepository.findAllByProduct_Id(productId)
-                .stream()
-                .map(productTradeType -> productTradeType.getTradeType().getName())
-                .toList());
+        List<ProductItemCondition> productItemConditions =
+                productItemConditionRepository.findAllWithItemConditionByProductIds(productIds);
 
-        tags.addAll(productPriceInfoRepository.findAllByProduct_Id(productId)
-                .stream()
-                .map(productPriceInfo -> productPriceInfo.getPriceInfo().getName())
-                .toList());
+        for (ProductItemCondition productItemCondition : productItemConditions) {
+            addTag(
+                    tagsByProductId,
+                    productItemCondition.getProduct().getId(),
+                    productItemCondition.getItemCondition().getName()
+            );
+        }
 
-        return tags;
+        List<ProductTradeType> productTradeTypes =
+                productTradeTypeRepository.findAllWithTradeTypeByProductIds(productIds);
+
+        for (ProductTradeType productTradeType : productTradeTypes) {
+            addTag(
+                    tagsByProductId,
+                    productTradeType.getProduct().getId(),
+                    productTradeType.getTradeType().getName()
+            );
+        }
+
+        List<ProductPriceInfo> productPriceInfos =
+                productPriceInfoRepository.findAllWithPriceInfoByProductIds(productIds);
+
+        for (ProductPriceInfo productPriceInfo : productPriceInfos) {
+            addTag(
+                    tagsByProductId,
+                    productPriceInfo.getProduct().getId(),
+                    productPriceInfo.getPriceInfo().getName()
+            );
+        }
+
+        return tagsByProductId;
+    }
+
+    private void addTag(Map<Long, List<String>> tagsByProductId, Long productId, String tagName) {
+        tagsByProductId
+                .computeIfAbsent(productId, id -> new ArrayList<>())
+                .add(tagName);
     }
 }
