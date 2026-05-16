@@ -17,4 +17,12 @@ public interface ProductItemConditionRepository extends JpaRepository<ProductIte
 			where pic.product.id in :productIds
 			""")
     List<ProductItemCondition> findAllWithItemConditionByProductIds(@Param("productIds") List<Long> productIds);
+
+	@Query("""
+			select pic
+			from ProductItemCondition pic
+			join fetch pic.itemCondition
+			where pic.product.id = :productId
+			""")
+	List<ProductItemCondition> findAllByProductId(@Param(value = "productId") long productId);
 }

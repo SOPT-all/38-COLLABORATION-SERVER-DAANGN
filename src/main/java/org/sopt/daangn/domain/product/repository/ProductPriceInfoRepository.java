@@ -17,4 +17,12 @@ public interface ProductPriceInfoRepository extends JpaRepository<ProductPriceIn
 			where ppi.product.id in :productIds
 			""")
     List<ProductPriceInfo> findAllWithPriceInfoByProductIds(@Param("productIds") List<Long> productIds);
+
+	@Query("""
+			select ppi
+			from ProductPriceInfo ppi
+			join fetch ppi.priceInfo
+			where ppi.product.id = :productId
+			""")
+	List<ProductPriceInfo> findAllByProductId(@Param(value = "productId") long productId);
 }
